@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Version Omega — Web Studio</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Reset & Base ─────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #080808;
+      --surface:   #111111;
+      --border:    rgba(255,255,255,0.08);
+      --accent:    #7c3aed;
+      --accent2:   #06b6d4;
+      --text:      #f1f5f9;
+      --muted:     #64748b;
+      --radius:    14px;
+    }
+
+    /* ─── Light mode ────────────────────────────────────────────── */
+    [data-theme="light"] {
+      --bg:      #f4f4f4;
+      --surface: #eaeaea;
+      --border:  rgba(0,0,0,0.09);
+      --text:    #0f172a;
+      --muted:   #6b7280;
+    }
+
+    [data-theme="light"] body      { background: var(--bg); color: var(--text); }
+    [data-theme="light"] nav       { background: rgba(244,244,244,0.88); }
+    [data-theme="light"] .hero-cipher-bg  { color: rgba(0,0,0,0.4); }
+    [data-theme="light"] .hero-watermark  { -webkit-text-stroke: 1.5px rgba(0,0,0,0.05); }
+    [data-theme="light"] .hero-spotlight  { background: linear-gradient(135deg, rgba(124,58,237,0.14), rgba(6,182,212,0.1)); }
+    [data-theme="light"] .hero-ambient    { background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(124,58,237,0.1) 0%, transparent 70%); }
+
+    /* ─── Theme toggle button ────────────────────────────────────── */
+    .theme-toggle {
+      width: 34px; height: 34px;
+      border-radius: 8px;
+      border: 1.5px solid rgba(255,255,255,0.18);
+      background: transparent;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text);
+      flex-shrink: 0;
+      padding: 0;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .theme-toggle:hover {
+      border-color: rgba(124,58,237,0.5);
+      background: rgba(124,58,237,0.08);
+    }
+    [data-theme="light"] .theme-toggle           { border-color: rgba(0,0,0,0.14); }
+    [data-theme="light"] .theme-toggle:hover     { border-color: rgba(124,58,237,0.4); background: rgba(124,58,237,0.07); }
+
+    /* ─── Smooth theme transition ───────────────────────────────── */
+    body, nav, footer,
+    .marquee-section, .marquee-track,
+    .service-card, .work-card, .work-info,
+    .about-point, .nav-cta, .btn-ghost,
+    .hero-badge, .work-thumb-label, .card-tag,
+    .section-label, .section-title, .section-sub,
+    .tech-badge, .hero-sub, h1, h2, h3, h4, p, span, a {
+      transition:
+        background-color 0.4s ease,
+        color            0.4s ease,
+        border-color     0.4s ease;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', system-ui, sans-serif;
+      font-size: 16px;
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+    }
+
+    a { color: inherit; text-decoration: none; }
+
+    /* ─── Scroll animations ────────────────────────────────────── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(28px);
+      transition: opacity 0.65s ease, transform 0.65s ease;
+    }
+    .fade-up.visible { opacity: 1; transform: translateY(0); }
+    .fade-up.delay-1 { transition-delay: 0.1s; }
+    .fade-up.delay-2 { transition-delay: 0.2s; }
+    .fade-up.delay-3 { transition-delay: 0.3s; }
+
+    /* ─── Nav ──────────────────────────────────────────────────── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1.1rem 2.5rem;
+      border-bottom: 1px solid var(--border);
+      background: rgba(8,8,8,0.8);
+      backdrop-filter: blur(16px);
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-weight: 700;
+      font-size: 0.95rem;
+      letter-spacing: -0.01em;
+    }
+
+    /* SVG logomark */
+    .logomark rect   { stroke: var(--text); }
+    .logomark .v     { fill: var(--text); }
+    .logomark .omega { fill: var(--accent); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 2rem;
+      list-style: none;
+      font-size: 0.875rem;
+      color: var(--muted);
+    }
+
+    .nav-links a:hover { color: var(--text); transition: color 0.2s; }
+
+    .nav-cta {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.5rem 1.1rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .nav-cta:hover { border-color: rgba(124,58,237,0.5); background: rgba(124,58,237,0.08); }
+
+    /* ─── Hero ─────────────────────────────────────────────────── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 8rem 2rem 5rem;
+      overflow: hidden;
+      cursor: crosshair;
+    }
+
+    /* grid lines */
+    .hero::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(var(--border) 1px, transparent 1px),
+        linear-gradient(90deg, var(--border) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
+    }
+
+    /* static ambient glow */
+    .hero-ambient {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(ellipse 60% 50% at 50% 0%, rgba(124,58,237,0.18) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    /* mouse-following layers */
+    .hero-spotlight {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(124,58,237,0.25), rgba(6,182,212,0.2));
+      -webkit-mask-image: radial-gradient(500px at var(--mx,50%) var(--my,50%), white, transparent);
+      mask-image:         radial-gradient(500px at var(--mx,50%) var(--my,50%), white, transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    .hero-cipher-bg {
+      position: absolute;
+      inset: 0;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      line-height: 16px;
+      color: rgba(255,255,255,0.55);
+      word-break: break-all;
+      white-space: pre-wrap;
+      -webkit-mask-image: radial-gradient(380px at var(--mx,50%) var(--my,50%), white, transparent);
+      mask-image:         radial-gradient(380px at var(--mx,50%) var(--my,50%), white, transparent);
+      mix-blend-mode: overlay;
+      opacity: 0;
+      transition: opacity 0.3s;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .hero:hover .hero-spotlight,
+    .hero:hover .hero-cipher-bg { opacity: 1; }
+
+    /* watermark Ω */
+    .hero-watermark {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: clamp(22rem, 52vw, 52rem);
+      font-weight: 900;
+      line-height: 1;
+      color: transparent;
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.045);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    /* hero content */
+    .hero-content { position: relative; z-index: 10; max-width: 760px; }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--accent2);
+      border: 1px solid rgba(6,182,212,0.3);
+      border-radius: 9999px;
+      padding: 0.3rem 0.85rem;
+      margin-bottom: 1.75rem;
+      background: rgba(6,182,212,0.06);
+    }
+
+    .hero-badge::before {
+      content: "";
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: var(--accent2);
+      box-shadow: 0 0 6px var(--accent2);
+      flex-shrink: 0;
+    }
+
+    .hero h1 {
+      font-size: clamp(2.8rem, 7vw, 5.5rem);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.04em;
+      margin-bottom: 1.5rem;
+    }
+
+    .hero h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #a78bfa, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .hero-sub {
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 400;
+      color: var(--muted);
+      max-width: 520px;
+      margin: 0 auto 2.5rem;
+      line-height: 1.7;
+    }
+
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.8rem 1.75rem;
+      border-radius: 9999px;
+      background: var(--accent);
+      color: #fff;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 32px rgba(124,58,237,0.35);
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.8rem 1.5rem;
+      border-radius: 9999px;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .btn-ghost:hover { color: var(--text); border-color: rgba(255,255,255,0.2); }
+
+    /* ─── Marquee / Tech Strip ─────────────────────────────────── */
+    .marquee-section {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 0;
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    .marquee-track {
+      display: flex;
+      gap: 2.5rem;
+      width: max-content;
+      animation: marquee 28s linear infinite;
+    }
+
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+
+    .tech-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      font-weight: 500;
+      color: var(--muted);
+      white-space: nowrap;
+      padding: 0.3rem 0.9rem;
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+    }
+
+    .tech-dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      flex-shrink: 0;
+    }
+
+    /* ─── Section shared ───────────────────────────────────────── */
+    section { padding: 6rem 2rem; }
+    .container { max-width: 1080px; margin: 0 auto; }
+
+    .section-label {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 1rem;
+    }
+
+    .section-title {
+      font-size: clamp(1.8rem, 4vw, 3rem);
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+      margin-bottom: 1.25rem;
+    }
+
+    .section-sub {
+      font-size: 1.05rem;
+      color: var(--muted);
+      max-width: 520px;
+      line-height: 1.75;
+    }
+
+    /* ─── About ────────────────────────────────────────────────── */
+    #about { background: var(--bg); }
+
+    .about-header {
+      display: grid;
+      grid-template-columns: 1fr 1.4fr;
+      gap: 3rem;
+      align-items: start;
+      margin-top: 2rem;
+      margin-bottom: 3.5rem;
+    }
+
+    .about-points {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .about-point {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 2rem 2rem 2rem 0;
+      border-right: 1px solid var(--border);
+      padding-top: 2rem;
+    }
+
+    .about-point:first-child { padding-left: 0; }
+    .about-point:not(:first-child) { padding-left: 2rem; }
+    .about-point:last-child { border-right: none; }
+
+    .point-icon {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .point-icon svg { width: 15px; height: 15px; stroke: #a78bfa; }
+
+    .about-point h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      letter-spacing: -0.01em;
+    }
+
+    .about-point p {
+      font-size: 0.85rem;
+      color: var(--muted);
+      line-height: 1.65;
+    }
+
+    /* ─── Services ─────────────────────────────────────────────── */
+    #services { background: var(--surface); }
+
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.25rem;
+      margin-top: 3.5rem;
+    }
+
+    .service-card {
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem;
+      background: var(--bg);
+      transition: border-color 0.25s, transform 0.25s;
+      cursor: default;
+    }
+
+    .service-card:hover {
+      border-color: rgba(124,58,237,0.4);
+      transform: translateY(-4px);
+    }
+
+    .service-icon {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      background: rgba(124,58,237,0.1);
+      border: 1px solid rgba(124,58,237,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+
+    .service-icon svg { width: 20px; height: 20px; stroke: #a78bfa; }
+
+    .service-card h3 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
+      letter-spacing: -0.02em;
+    }
+
+    .service-card p {
+      font-size: 0.875rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+
+    /* ─── Work ─────────────────────────────────────────────────── */
+    #work { background: var(--bg); }
+
+    .work-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.5rem;
+      margin-top: 3.5rem;
+    }
+
+    .work-card {
+      border-radius: var(--radius);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      transition: border-color 0.25s, transform 0.25s;
+      cursor: pointer;
+    }
+
+    .work-card:hover {
+      border-color: rgba(255,255,255,0.15);
+      transform: translateY(-4px);
+    }
+
+    .work-thumb {
+      height: 220px;
+      display: flex;
+      align-items: flex-end;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .work-thumb-1 {
+      background: linear-gradient(135deg, #1a0533 0%, #0f2030 50%, #0a1628 100%);
+    }
+
+    .work-thumb-2 {
+      background: linear-gradient(135deg, #012030 0%, #013d2e 50%, #002218 100%);
+    }
+
+    .work-thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: inherit;
+      filter: blur(0px);
+    }
+
+    /* decorative circles */
+    .thumb-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(40px);
+      pointer-events: none;
+    }
+
+    .thumb-orb-1a { width: 140px; height: 140px; background: rgba(124,58,237,0.35); top: -20px; right: 20px; }
+    .thumb-orb-1b { width: 80px;  height: 80px;  background: rgba(6,182,212,0.2);   bottom: 20px; left: 20px; }
+    .thumb-orb-2a { width: 120px; height: 120px; background: rgba(6,182,212,0.3);   top: -10px; left: 30px; }
+    .thumb-orb-2b { width: 90px;  height: 90px;  background: rgba(16,185,129,0.25); bottom: 10px; right: 20px; }
+
+    .work-thumb-label {
+      position: relative;
+      z-index: 10;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 9999px;
+      padding: 0.25rem 0.7rem;
+      background: rgba(255,255,255,0.05);
+      backdrop-filter: blur(8px);
+    }
+
+    .work-info {
+      padding: 1.4rem 1.6rem;
+      background: var(--surface);
+    }
+
+    .work-info h3 {
+      font-size: 1rem;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.35rem;
+    }
+
+    .work-info p {
+      font-size: 0.82rem;
+      color: var(--muted);
+    }
+
+    .work-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.3rem;
+      margin-top: 0.9rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: #a78bfa;
+      transition: gap 0.2s;
+    }
+
+    .work-card:hover .work-link { gap: 0.5rem; }
+
+    /* ─── CTA ──────────────────────────────────────────────────── */
+    #contact {
+      background: var(--surface);
+      border-top: 1px solid var(--border);
+    }
+
+    .cta-inner {
+      max-width: 640px;
+      margin: 0 auto;
+      text-align: center;
+    }
+
+    .cta-inner .section-title { font-size: clamp(2rem, 5vw, 3.5rem); }
+
+    .cta-inner .section-sub {
+      max-width: 100%;
+      margin: 0 auto 2.5rem;
+    }
+
+    .cta-email {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--muted);
+      margin-top: 1.25rem;
+      display: block;
+    }
+
+    /* ─── Footer ───────────────────────────────────────────────── */
+    footer {
+      padding: 2rem 2.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-size: 0.8rem;
+      color: var(--muted);
+    }
+
+    .footer-logo { display: flex; align-items: center; gap: 0.5rem; font-weight: 600; color: var(--text); }
+
+    footer a:hover { color: var(--text); transition: color 0.2s; }
+
+    /* ─── Responsive ───────────────────────────────────────────── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .nav-links { display: none; }
+      .about-header { grid-template-columns: 1fr; gap: 1.5rem; }
+      .about-points { grid-template-columns: 1fr; }
+      .about-point { border-right: none; border-bottom: 1px solid var(--border); padding: 1.5rem 0; }
+      .about-point:last-child { border-bottom: none; }
+      .services-grid { grid-template-columns: 1fr; }
+      .work-grid { grid-template-columns: 1fr; }
+      footer { flex-direction: column; gap: 0.75rem; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ─── Nav ─────────────────────────────────────────────────── -->
+  <nav>
+    <div class="nav-logo">
+      <!-- Light/dark toggle replaces logomark -->
+      <button class="theme-toggle" id="themeToggle" aria-label="Toggle light / dark mode">
+        <svg class="toggle-icon" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- outer ring -->
+          <circle cx="9" cy="9" r="7.5" stroke="currentColor" stroke-width="1.3"/>
+          <!-- left half filled (represents current-mode shade) -->
+          <path d="M9 1.5 A7.5 7.5 0 0 0 9 16.5 Z" fill="currentColor"/>
+        </svg>
+      </button>
+      Version Omega
+    </div>
+
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#services">Services</a></li>
+      <li><a href="#work">Work</a></li>
+    </ul>
+
+    <a class="nav-cta" href="#contact">Get in touch →</a>
+  </nav>
+
+
+  <!-- ─── Hero ─────────────────────────────────────────────────── -->
+  <section class="hero" id="hero">
+    <div class="hero-ambient"></div>
+    <div class="hero-spotlight"></div>
+    <div class="hero-cipher-bg" id="heroCipher"></div>
+    <div class="hero-watermark">Ω</div>
+
+    <div class="hero-content">
+      <div class="hero-badge">vΩ · open for projects</div>
+
+      <h1>Websites built<br /><em>different.</em></h1>
+
+      <p class="hero-sub">
+        A one-person web studio run by a high schooler who actually cares
+        about code. Modern tools, personal attention, no agency overhead.
+      </p>
+
+      <div class="hero-actions">
+        <a class="btn-primary" href="#contact">
+          Start a project
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <a class="btn-ghost" href="#work">See the work</a>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Tech Marquee ─────────────────────────────────────────── -->
+  <div class="marquee-section">
+    <div class="marquee-track" id="marquee"></div>
+  </div>
+
+
+  <!-- ─── About ────────────────────────────────────────────────── -->
+  <section id="about">
+    <div class="container">
+      <span class="section-label fade-up">// who's behind vΩ</span>
+
+      <div class="about-header">
+        <h2 class="section-title fade-up">No agency.<br />No templates.<br />Just me.</h2>
+        <p class="section-sub fade-up delay-1">
+          Version Omega is run single-handedly by me, a high school student with a genuine
+          passion for computer science. When you choose me, you're supporting my small business and 
+          helping me to sharpen my coding skills through the best teacher on the market; experience.
+          Better yet, you're getting not getting a junior dev buried on a large team, you're getting a solo developer who
+          will obsess over your site until it's exactly right.
+        </p>
+      </div>
+
+      <div class="about-points">
+        <div class="about-point fade-up delay-1">
+          <div class="point-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M17.25 6.75 22.5 12l-5.25 5.25m-10.5 0L1.5 12l5.25-5.25m7.5-3-4.5 16.5"/></svg>
+          </div>
+          <h4>Quality code, every time.</h4>
+          <p>No Wix, no Squarespace, no templates. Every line is written from scratch using modern web standards and specially crafted to make your business stand out against the noise.</p>
+        </div>
+
+        <div class="about-point fade-up delay-2">
+          <div class="point-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334a2.126 2.126 0 0 0-.476-.095 48.64 48.64 0 0 0-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg>
+          </div>
+          <h4>Direct communication.</h4>
+          <p>You only to me, the person building your site, start to finish. No account managers, no middlemen, no lag.</p>
+        </div>
+
+        <div class="about-point fade-up delay-3">
+          <div class="point-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 13.5 10.5 6.75 14.25 10.5 20.25 3.75M3.75 13.5H9m-5.25 0V18"/></svg>
+          </div>
+          <h4>A Small Business Priced for small businesses.</h4>
+          <p>Top-tier tools and craft, without the agency price tag that comes with 40 people on payroll. Your dollars go towards supporting a young coder's dream, not some tech CEO's ninth supercar.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Services ─────────────────────────────────────────────── -->
+  <section id="services">
+    <div class="container">
+      <span class="section-label fade-up">// what i build</span>
+      <h2 class="section-title fade-up">Three things, done to perfection.</h2>
+
+      <div class="services-grid">
+        <div class="service-card fade-up delay-1">
+          <div class="service-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9 17.25v1.007a3 3 0 0 1-.879 2.122L7.5 21h9l-.621-.621A3 3 0 0 1 15 18.257V17.25m6-12V15a2.25 2.25 0 0 1-2.25 2.25H5.25A2.25 2.25 0 0 1 3 15V5.25m18 0A2.25 2.25 0 0 0 18.75 3H5.25A2.25 2.25 0 0 0 3 5.25m18 0H3"/></svg>
+          </div>
+          <h3>Brand Websites</h3>
+          <p>Full custom sites built around your brand identity. Designed to feel like you, not like a template that 10,000 other businesses are running.</p>
+        </div>
+
+        <div class="service-card fade-up delay-2">
+          <div class="service-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M3.75 3.75v4.5m0-4.5h4.5m-4.5 0L9 9M3.75 20.25v-4.5m0 4.5h4.5m-4.5 0L9 15M20.25 3.75h-4.5m4.5 0v4.5m0-4.5L15 9m5.25 11.25h-4.5m4.5 0v-4.5m0 4.5L15 15"/></svg>
+          </div>
+          <h3>Landing Pages</h3>
+          <p>Fast, focused, and built to convert. Perfect for launches, campaigns, or just getting your name out there with something that looks sharp.</p>
+        </div>
+
+        <div class="service-card fade-up delay-3">
+          <div class="service-icon">
+            <svg fill="none" viewBox="0 0 24 24" stroke-width="1.8"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/></svg>
+          </div>
+          <h3>Interactive Experiences</h3>
+          <p>Animations, effects, and interactions that make your brand impossible to forget. The same dazzling graphics used by top studios, applied to your project for a fraction of the cost.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Work ──────────────────────────────────────────────────── -->
+  <section id="work">
+    <div class="container">
+      <span class="section-label fade-up">// recent work</span>
+      <h2 class="section-title fade-up">Built from scratch,<br />start to finish.</h2>
+
+      <div class="work-grid">
+
+        <div class="work-card fade-up delay-1">
+          <div class="work-thumb work-thumb-1">
+            <div class="thumb-orb thumb-orb-1a"></div>
+            <div class="thumb-orb thumb-orb-1b"></div>
+            <span class="work-thumb-label">Brand Website</span>
+          </div>
+          <div class="work-info">
+            <h3>Moth &amp; Moon</h3>
+            <p>Full brand website for a local small business — custom layout, motion design, and responsive across every device.</p>
+            <span class="work-link">View project <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+          </div>
+        </div>
+
+        <div class="work-card fade-up delay-2">
+          <div class="work-thumb work-thumb-2">
+            <div class="thumb-orb thumb-orb-2a"></div>
+            <div class="thumb-orb thumb-orb-2b"></div>
+            <span class="work-thumb-label">Brand Website</span>
+          </div>
+          <div class="work-info">
+            <h3>Briny's Clam Shack</h3>
+            <p>Website for a local seafood spot — warm, inviting design that matches the restaurant's personality, built to load fast and look great on mobile.</p>
+            <span class="work-link">View project <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg></span>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── CTA / Contact ─────────────────────────────────────────── -->
+  <section id="contact">
+    <div class="container">
+      <div class="cta-inner">
+        <span class="section-label fade-up">// let's build something</span>
+        <h2 class="section-title fade-up">Have a project<br />in mind?</h2>
+        <p class="section-sub fade-up delay-1">
+          Whether you have a full brief or just a rough idea, reach out.
+          I'll tell you honestly what I can do and what it'll take.
+        </p>
+        <a class="btn-primary fade-up delay-2" href="mailto:hello@versionomega.studio">
+          Send a message
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </a>
+        <span class="cta-email fade-up delay-3">or find me at hello@versionomega.studio</span>
+      </div>
+    </div>
+  </section>
+
+
+  <!-- ─── Footer ───────────────────────────────────────────────── -->
+  <footer>
+    <div class="footer-logo">
+      <svg width="24" height="24" viewBox="0 0 34 34" fill="none">
+        <rect x="1" y="1" width="32" height="32" rx="7" stroke="white" stroke-opacity="0.7" stroke-width="1.5"/>
+        <text x="17" y="24" text-anchor="middle" font-family="Inter, sans-serif" font-weight="900" font-size="17" letter-spacing="-0.5">
+          <tspan fill="#7c3aed">Ω</tspan>
+        </text>
+      </svg>
+      Version Omega
+    </div>
+    <span>Built by hand, with intention.</span>
+    <span>© 2025 Version Omega</span>
+  </footer>
+
+
+  <script>
+    /* ── Cipher helpers ── */
+    const CHARS = "アイウエオカキクケコサシスセソ01!@#$%^&*ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789</>{}[];:";
+    function rndStr(n) {
+      let s = "";
+      for (let i = 0; i < n; i++) s += CHARS[Math.floor(Math.random() * CHARS.length)];
+      return s;
+    }
+
+    /* ── Hero cipher effect ── */
+    const hero       = document.getElementById("hero");
+    const heroCipher = document.getElementById("heroCipher");
+
+    // Fill enough chars to cover any viewport (chars per row ≈ vw/7, rows ≈ vh/16)
+    function heroFill() {
+      const cols = Math.ceil(window.innerWidth  / 7) + 4;
+      const rows = Math.ceil(window.innerHeight / 16) + 4;
+      return rndStr(cols * rows);
+    }
+
+    heroCipher.textContent = heroFill();
+    window.addEventListener("resize", () => { heroCipher.textContent = heroFill(); });
+
+    hero.addEventListener("mousemove", (e) => {
+      const { left, top } = hero.getBoundingClientRect();
+      hero.style.setProperty("--mx", (e.clientX - left) + "px");
+      hero.style.setProperty("--my", (e.clientY - top)  + "px");
+      heroCipher.textContent = heroFill();
+    });
+
+    /* ── Tech marquee ── */
+    const stack = [
+      { name: "React",         color: "#61dafb" },
+      { name: "Next.js",       color: "#ffffff" },
+      { name: "TypeScript",    color: "#3178c6" },
+      { name: "Tailwind CSS",  color: "#38bdf8" },
+      { name: "Framer Motion", color: "#bb86fc" },
+      { name: "Figma",         color: "#f24e1e" },
+      { name: "Vercel",        color: "#ffffff" },
+      { name: "Node.js",       color: "#68a063" },
+      { name: "CSS3",          color: "#264de4" },
+      { name: "HTML5",         color: "#e34f26" },
+    ];
+
+    const marquee = document.getElementById("marquee");
+    // Duplicate for seamless loop
+    [...stack, ...stack].forEach(({ name, color }) => {
+      const el = document.createElement("span");
+      el.className = "tech-badge";
+      el.innerHTML = `<span class="tech-dot" style="background:${color};box-shadow:0 0 6px ${color}66"></span>${name}`;
+      marquee.appendChild(el);
+    });
+
+    /* ── Scroll fade-in ── */
+    const observer = new IntersectionObserver(
+      (entries) => entries.forEach(e => { if (e.isIntersecting) e.target.classList.add("visible"); }),
+      { threshold: 0.12 }
+    );
+    document.querySelectorAll(".fade-up").forEach(el => observer.observe(el));
+
+    /* ── Theme toggle ── */
+    document.getElementById("themeToggle").addEventListener("click", () => {
+      const html = document.documentElement;
+      html.dataset.theme = html.dataset.theme === "light" ? "dark" : "light";
+    });
+  </script>
+
+</body>
+</html>
